@@ -19,6 +19,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Enable default lighting
+        sceneView.autoenablesDefaultLighting = true
+        
         // Set the view's delegate
         sceneView.delegate = self
         
@@ -28,11 +31,11 @@ class ViewController: UIViewController {
         // Show origin and feature points
         sceneView.debugOptions = [ARSCNDebugOptions.showWorldOrigin, ARSCNDebugOptions.showFeaturePoints]
         
-        // Create a new scene
-        let scene = SCNScene(named: "art.scnassets/ship.scn")!
-        
-        // Set the scene to the view
-        sceneView.scene = scene
+//        // Create a new scene
+//        let scene = SCNScene()
+//
+//        // Set the scene to the view
+//        sceneView.scene = scene
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -68,6 +71,15 @@ class ViewController: UIViewController {
         
         return node
     }
+    
+    func createShip() -> SCNNode {
+        let scene = SCNScene(named: "art.scnassets/ship.scn")!
+        
+        let node = scene.rootNode
+        node.scale = SCNVector3(0.1, 0.1, 0.1)
+        
+        return node
+    }
 }
 
 // MARK: - ARSCNViewDelegate
@@ -77,6 +89,9 @@ extension ViewController: ARSCNViewDelegate {
         
         let planeNode = createPlane(anchor: planeAnchor)
         node.addChildNode(planeNode)
+        
+        let ship = createShip()
+        node.addChildNode(ship)
     }
     
     func renderer(_ renderer: SCNSceneRenderer, didUpdate node: SCNNode, for anchor: ARAnchor) {
@@ -89,7 +104,9 @@ extension ViewController: ARSCNViewDelegate {
         plane.height = CGFloat(extent.z)
         
         let center = planeAnchor.center
-        planeNode.position.x = center.x
-        planeNode.position.z = center.z
+        for childNode in node.childNodes {
+            childNode.position.x = center.x
+            childNode.position.z = center.z
+        }
     }
 }
